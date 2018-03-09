@@ -14,8 +14,7 @@ def point(ncd_name,lon,lat):
     # Outputs
     # dq = convective heat flux [W m-2]
     # Hypotesis
-    # 1. t can be interpolated linearly
-    # 2. vertical advective fluxes neglected (need also w)
+    # - vertical advective fluxes neglected (need also w)
     # constant (to be edited event.)
     #############################
     # constants
@@ -36,10 +35,10 @@ def point(ncd_name,lon,lat):
     v = ncd.variables['V'][0,-1,:,:]
     t = ncd.variables['T'][0,-1,:,:]
     # advective flux
-    q_in_x = rho*cps*u[idy,idx]*(t[idy,idx]+t[idy,idx-1])**0.5
-    q_out_x = rho*cps*u[idy,idx+1]*(t[idy,idx]+t[idy,idx+1])**0.5
-    q_in_y = rho*cps*v[idy,idx]*(t[idy,idx]+t[idy-1,idx])**0.5
-    q_out_y = rho*cps*v[idy+1,idx]*(t[idy,idx]+t[idy+1,idx])**0.5
+    q_in_x = rho*cps*u[idy,idx]*t[idy,idx-1]
+    q_out_x = rho*cps*u[idy,idx+1]*t[idy,idx+1]
+    q_in_y = rho*cps*v[idy,idx]*t[idy-1,idx]
+    q_out_y = rho*cps*v[idy+1,idx]*t[idy+1,idx]
     Dq = q_in_x - q_out_x + q_in_y - q_out_y
     # convert to horizontal
     h = vcoord[-2] - vcoord[-1]
@@ -53,13 +52,10 @@ def spatial(ncd_name):
     ##########################
     # Inputs
     # ncd = path to netcdf file
-    # lon = geographical longitude
-    # lat = geographical latitude
     # Outputs
     # dq = convective heat flux [W m-2]
     # Hypotesis
-    # 1. t can be interpolated linearly
-    # 2. vertical advective fluxes neglected (need also w)
+    # - vertical advective fluxes neglected (need also w)
     # constant (to be edited event.)
     #############################
     # constants
@@ -78,10 +74,10 @@ def spatial(ncd_name):
     # advective flux
     for j in range(0, np.shape(u)[0]-1):
         for k in range(0, np.shape(u)[1]-1):
-            q_in_x = rho*cps*u[j,k]*(t[j,k]+t[j,k-1])**0.5
-            q_out_x = rho*cps*u[j,k+1]*(t[j,k]+t[j,k+1])**0.5
-            q_in_y = rho*cps*v[j,k]*(t[j,k]+t[j-1,k])**0.5
-            q_out_y = rho*cps*v[j+1,k]*(t[j,k]+t[j+1,k])**0.5
+            q_in_x = rho*cps*u[j,k]*t[j,k-1]
+            q_out_x = rho*cps*u[j,k+1]*t[j,k+1]
+            q_in_y = rho*cps*v[j,k]*t[j-1,k]
+            q_out_y = rho*cps*v[j+1,k]*t[j+1,k]
             Dq[j,k] = q_in_x - q_out_x + q_in_y - q_out_y
 
 
