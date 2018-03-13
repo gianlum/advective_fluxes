@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # python
 
+<<<<<<< HEAD
 import sys
 import numpy as np
 from netCDF4 import Dataset
@@ -8,6 +9,13 @@ import geo2rot
 import geom
 
 def point(ncd_name,dim,lon,lat):
+=======
+import numpy as np
+from netCDF4 import Dataset
+import geo2rot
+
+def point(ncd_name,lon,lat):
+>>>>>>> 4784874e62abfe3cb6dab4bcd7ead5a696d58726
     ##########################
     # Inputs
     # ncd = path to netcdf file
@@ -16,12 +24,22 @@ def point(ncd_name,dim,lon,lat):
     # Outputs
     # dq = convective heat flux [W m-2]
     # Hypotesis
+<<<<<<< HEAD
     # 1. t can be interpolated linearly
     # 2. vertical advective fluxes neglected (need also w)
     # constant (to be edited event.)
     #############################
     # constants
     cps = 718 # J kg-1 K-1 specific heat capacity of air at constant volume
+=======
+    # - vertical advective fluxes neglected (need also w)
+    # constant (to be edited event.)
+    #############################
+    # constants
+    rho = 1 # kg m-3
+    cps = 1000 # J kg-1 K-1
+    ds = 280 # m
+>>>>>>> 4784874e62abfe3cb6dab4bcd7ead5a696d58726
     # read grid variables
     ncd = Dataset(ncd_name,'r')
     rlon = ncd.variables['rlon'][:]
@@ -35,6 +53,7 @@ def point(ncd_name,dim,lon,lat):
     u = ncd.variables['U'][0,-1,:,:]
     v = ncd.variables['V'][0,-1,:,:]
     t = ncd.variables['T'][0,-1,:,:]
+<<<<<<< HEAD
     w = ncd.variables['W'][0,-1,:,:]
     tup = ncd.variables['T'][0,-2,:,:]
     rho = ncd.variables['RHO'][0,-1,:,:]
@@ -120,4 +139,60 @@ def spatial(nc_name):
 
 
     return Dq
+=======
+    # advective flux
+    q_in_x = rho*cps*u[idy,idx]*t[idy,idx-1]
+    q_out_x = rho*cps*u[idy,idx+1]*t[idy,idx+1]
+    q_in_y = rho*cps*v[idy,idx]*t[idy-1,idx]
+    q_out_y = rho*cps*v[idy+1,idx]*t[idy+1,idx]
+    Dq = q_in_x - q_out_x + q_in_y - q_out_y
+    # convert to horizontal
+    h = vcoord[-2] - vcoord[-1]
+    Av = h * ds
+    Ah = ds**2
+    dh = Av/Ah
+    Dq_hor = Dq * dh
+    return Dq_hor
+
+def spatial(ncd_name):
+    ##########################
+    # Inputs
+    # ncd = path to netcdf file
+    # Outputs
+    # dq = convective heat flux [W m-2]
+    # Hypotesis
+    # - vertical advective fluxes neglected (need also w)
+    # constant (to be edited event.)
+    #############################
+    # constants
+    rho = 1 # kg m-3
+    cps = 1000 # J kg-1 K-1
+    ds = 280 # m
+    # read grid variables
+    ncd = Dataset(ncd_name,'r')
+    vcoord = ncd.variables['vcoord']
+    # read variables            
+    u = ncd.variables['U'][0,-1,:,:]
+    v = ncd.variables['V'][0,-1,:,:]
+    t = ncd.variables['T'][0,-1,:,:]
+    # define output variable
+    Dq = np.zeros((np.shape(u)[0]-1,np.shape(u)[1]-1))
+    # advective flux
+    for j in range(0, np.shape(u)[0]-1):
+        for k in range(0, np.shape(u)[1]-1):
+            q_in_x = rho*cps*u[j,k]*t[j,k-1]
+            q_out_x = rho*cps*u[j,k+1]*t[j,k+1]
+            q_in_y = rho*cps*v[j,k]*t[j-1,k]
+            q_out_y = rho*cps*v[j+1,k]*t[j+1,k]
+            Dq[j,k] = q_in_x - q_out_x + q_in_y - q_out_y
+
+
+    # convert to horizontal
+    h = vcoord[-2] - vcoord[-1]
+    Av = h * ds
+    Ah = ds**2
+    dh = Av/Ah
+    Dq_hor = Dq * dh
+    return Dq_hor
+>>>>>>> 4784874e62abfe3cb6dab4bcd7ead5a696d58726
 
