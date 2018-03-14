@@ -1,21 +1,13 @@
 #!/usr/bin/env python
 # python
 
-<<<<<<< HEAD
 import sys
 import numpy as np
 from netCDF4 import Dataset
 import geo2rot
 import geom
 
-def point(ncd_name,dim,lon,lat):
-=======
-import numpy as np
-from netCDF4 import Dataset
-import geo2rot
-
 def point(ncd_name,lon,lat):
->>>>>>> 4784874e62abfe3cb6dab4bcd7ead5a696d58726
     ##########################
     # Inputs
     # ncd = path to netcdf file
@@ -23,23 +15,9 @@ def point(ncd_name,lon,lat):
     # lat = geographical latitude
     # Outputs
     # dq = convective heat flux [W m-2]
-    # Hypotesis
-<<<<<<< HEAD
-    # 1. t can be interpolated linearly
-    # 2. vertical advective fluxes neglected (need also w)
-    # constant (to be edited event.)
     #############################
     # constants
-    cps = 718 # J kg-1 K-1 specific heat capacity of air at constant volume
-=======
-    # - vertical advective fluxes neglected (need also w)
-    # constant (to be edited event.)
-    #############################
-    # constants
-    rho = 1 # kg m-3
-    cps = 1000 # J kg-1 K-1
-    ds = 280 # m
->>>>>>> 4784874e62abfe3cb6dab4bcd7ead5a696d58726
+    cps = 1000 # J kg-1 K-1 heat capacity of the air
     # read grid variables
     ncd = Dataset(ncd_name,'r')
     rlon = ncd.variables['rlon'][:]
@@ -53,7 +31,6 @@ def point(ncd_name,lon,lat):
     u = ncd.variables['U'][0,-1,:,:]
     v = ncd.variables['V'][0,-1,:,:]
     t = ncd.variables['T'][0,-1,:,:]
-<<<<<<< HEAD
     w = ncd.variables['W'][0,-1,:,:]
     tup = ncd.variables['T'][0,-2,:,:]
     rho = ncd.variables['RHO'][0,-1,:,:]
@@ -85,7 +62,8 @@ def point(ncd_name,lon,lat):
              v[idy+1,idx] * ((t[idy,idx]+t[idy+1,idx])/2)
     Dq_tot = q_in_x - q_out_x + q_in_y - q_out_y # in W
     Dq_vol = Dq_tot / (dx * dy * h) # volumetric (W/m3)
-    Dq_flux = Dq_vol * h  # W / m2 as other fluxes
+    Dq_flux = Dq_vol * h  # W / m2 as other turbulent (unresolved) fluxes
+    # vertical component not considered
     #q_out_z = cps * ((rhoup[idy,idx]+rho[idy,idx])/2) *         \
     #         w[idy+1,idx] * ((tup[idy,idx]+t[idy,idx])/2)
     return Dq_flux
@@ -194,5 +172,4 @@ def spatial(ncd_name):
     dh = Av/Ah
     Dq_hor = Dq * dh
     return Dq_hor
->>>>>>> 4784874e62abfe3cb6dab4bcd7ead5a696d58726
 
